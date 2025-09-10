@@ -15,8 +15,9 @@ export declare type CreateUserParams = {
 export declare type UpdateUserParams = {
   firstName: string;
   lastName: string;
-  username: string;
+  username: string | null;
   photo: string;
+  profileCompleted?: boolean;
 };
 
 // ====== IMAGE PARAMS

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider, SignInButton, SignUpButton, SignedIn, SignedOut, UserButton, } from "@clerk/nextjs";
+import ProfileSetupGuard from "@/components/shared/ProfileGuard";
 
 const ibmPlexSans = IBM_Plex_Sans({
   variable: "--font-ibm-plex-sans",
@@ -22,7 +23,9 @@ export default function RootLayout({
     <ClerkProvider appearance={{variables: {colorPrimary: '#624CF5'}}}> 
       <html lang="en">
         <body className={`${ibmPlexSans.variable} antialiased`} >
-          {children}
+          <ProfileSetupGuard>
+            {children}
+          </ProfileSetupGuard>
         </body>
       </html>
     </ClerkProvider>

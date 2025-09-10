@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import { updateUser } from "@/lib/actions/user.actions";
 import { connectToDatabase } from "@/lib/database/mongoose";
 import User from "@/lib/models/user.model";
@@ -23,6 +23,14 @@ export async function POST(req: Request) {
         message: "Username must be at least 3 characters" 
       }, { status: 400 });
     }
+
+    const usernameRegex = /^[a-z0-9_]+$/;
+    if (!usernameRegex.test(username)) {
+      return NextResponse.json({ 
+        message: "Username can only contain lowercase letters, numbers, and underscores" 
+      }, { status: 400 });
+    }
+
     await connectToDatabase();
 
     const existingUser = await User.findOne({ 
@@ -43,6 +51,17 @@ export async function POST(req: Request) {
         message: "User not found" 
       }, { status: 404 });
     }
+
+    try {
+      const clerk = await clerkClient();
+      await clerk.users.updateUser(clerkId, {
+        username: username.toLowerCase()
+      });
+      console.log("✅ Clerk username updated successfully");
+    } catch (clerkError: any) {
+      console.warn("⚠️ Could not update username in Clerk:", clerkError.message);
+    }
+
     const updatedUser = await updateUser(clerkId, { 
       username: username.toLowerCase(),
       firstName: currentUser.firstName,

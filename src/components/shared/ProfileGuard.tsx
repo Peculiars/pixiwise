@@ -16,12 +16,6 @@ const ProfileSetupGuard = ({ children }: { children: React.ReactNode }) => {
       }
 
       try {
-        if (!user.username) {
-          console.log("User has no username in Clerk, needs setup");
-          setNeedsProfileSetup(true);
-          setIsChecking(false);
-          return;
-        }
         const response = await fetch(`/api/user/profile-status?clerkId=${user.id}`);
         if (!response.ok) {
           console.error("Failed to fetch profile status");
@@ -32,8 +26,15 @@ const ProfileSetupGuard = ({ children }: { children: React.ReactNode }) => {
 
         const data = await response.json();
         console.log("Profile status data:", data);
-
-        const needsSetup = !data.profileCompleted || !data.username;
+        const needsSetup = !data.profileCompleted || !data.username || !data.hasUsername;
+        
+        console.log("Profile setup needed:", needsSetup, {
+          profileCompleted: data.profileCompleted,
+          hasUsername: data.hasUsername,
+          username: data.username,
+          clerkUsername: user.username
+        });
+        
         setNeedsProfileSetup(needsSetup);
         
       } catch (error) {
@@ -59,13 +60,14 @@ const ProfileSetupGuard = ({ children }: { children: React.ReactNode }) => {
       </div>
     );
   }
-
   if (!user) {
     return <>{children}</>;
   }
+
   if (needsProfileSetup) {
     return <UsernameSetup onComplete={handleProfileComplete} />;
   }
+
   return <>{children}</>;
 };
 

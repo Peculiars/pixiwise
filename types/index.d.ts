@@ -26,8 +26,8 @@ export declare type AddImageParams = {
     title: string;
     publicId: string;
     transformationType: string;
-    width: number;
-    height: number;
+    width: number | string;
+    height: number | string;
     config: any;
     secureURL: string;
     transformationURL: string;
@@ -41,12 +41,12 @@ export declare type AddImageParams = {
 
 export declare type UpdateImageParams = {
   image: {
-    _id: string;
+    _id: string | unknown;
     title: string;
     publicId: string;
     transformationType: string;
-    width: number;
-    height: number;
+    width: number | string;
+    height: number | string;
     config: any;
     secureURL: string;
     transformationURL: string;

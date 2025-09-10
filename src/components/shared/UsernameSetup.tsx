@@ -62,9 +62,6 @@ const UsernameSetup = ({ onComplete }: UsernameSetupProps) => {
     setError('');
 
     try {
-      await user.update({
-        username: username
-      });
       const response = await fetch('/api/user/update-username', {
         method: 'POST',
         headers: {
@@ -76,12 +73,13 @@ const UsernameSetup = ({ onComplete }: UsernameSetupProps) => {
         }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const data = await response.json();
         throw new Error(data.message || 'Failed to update username');
       }
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
+      console.log('Username updated successfully:', data);
       onComplete();
     } catch (err: any) {
       console.error('Error updating username:', err);

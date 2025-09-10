@@ -1,3 +1,4 @@
+"use client";
 import User from '@/lib/models/user.model';
 import { UserButton } from '@clerk/nextjs';
 import React, { useState } from 'react'

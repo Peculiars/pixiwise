@@ -7,7 +7,17 @@ import { checkoutCredits } from "@/lib/actions/transaction.action";
 import { Button } from "../ui/button";
 import { useToast } from "@/hooks/use-toast";
 
-const Checkout = ({ plan, amount, credits, buyerId, }: { plan: string; amount: number; credits: number; buyerId: string; }) => {
+const Checkout = ({ 
+  plan, 
+  amount, 
+  credits, 
+  buyerId, 
+}: { 
+  plan: string; 
+  amount: number; 
+  credits: number; 
+  buyerId: string; 
+}) => {
   const { toast } = useToast();
 
   useEffect(() => {
@@ -33,7 +43,7 @@ const Checkout = ({ plan, amount, credits, buyerId, }: { plan: string; amount: n
         className: "error-toast",
       });
     }
-  }, []);
+  }, [toast]); 
 
   const onCheckout = async () => {
     const transaction = {
@@ -47,7 +57,7 @@ const Checkout = ({ plan, amount, credits, buyerId, }: { plan: string; amount: n
   };
 
   return (
-    <form action={onCheckout} method="POST">
+    <form action={onCheckout}>
       <section>
         <Button
           type="submit"

@@ -13,6 +13,15 @@ export function cn(...inputs: ClassValue[]) {
 
 // ERROR HANDLER
 export const handleError = (error: unknown) => {
+  if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
+    throw error; 
+  }
+  
+  if (error instanceof Error && 'digest' in error && 
+      typeof error.digest === 'string' && error.digest.startsWith('NEXT_REDIRECT')) {
+    throw error; 
+  }
+
   if (error instanceof Error) {
     console.error(error.message);
     throw new Error(`Error: ${error.message}`);

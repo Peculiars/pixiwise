@@ -6,8 +6,8 @@ import { navLinks } from "../../../constants";
 import { Collection } from "@/components/shared/Collection";
 
 const Home = async ({ searchParams }: SearchParamProps) => {
-  const page = Number(searchParams?.page) || 1;
-  const searchQuery = (searchParams?.query as string) || '';
+  const page = await Number(searchParams?.page) || 1;
+  const searchQuery = typeof searchParams?.query === 'string' ? searchParams.query : '';
 
   const images = await getAllImages({ page, searchQuery})
 

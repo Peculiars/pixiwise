@@ -19,13 +19,11 @@ export async function POST(req: Request) {
     );
   }
 
-  // Get the headers
   const headerPayload = await headers();
   const svix_id = headerPayload.get("svix-id");
   const svix_timestamp = headerPayload.get("svix-timestamp");
   const svix_signature = headerPayload.get("svix-signature");
 
-  // If there are no headers, error out
   if (!svix_id || !svix_timestamp || !svix_signature) {
     console.error("❌ Missing svix headers");
     return new Response("Error occured -- no svix headers", {
@@ -33,16 +31,12 @@ export async function POST(req: Request) {
     });
   }
 
-  // Get the body
   const payload = await req.json();
   const body = JSON.stringify(payload);
 
-  // Create a new Svix instance with your secret.
   const wh = new Webhook(WEBHOOK_SECRET);
 
   let evt: WebhookEvent;
-
-  // Verify the payload with the headers
   try {
     evt = wh.verify(body, {
       "svix-id": svix_id,
@@ -56,7 +50,6 @@ export async function POST(req: Request) {
     });
   }
 
-  // Get the ID and type
   const { id } = evt.data;
   const eventType = evt.type;
 
@@ -68,14 +61,13 @@ export async function POST(req: Request) {
     
     const { id, email_addresses, image_url, first_name, last_name, username } = evt.data;
 
-    // Handle potential null/undefined values
     const user = {
       clerkId: id,
       email: email_addresses[0].email_address,
-      username: username || `user_${id.slice(-8)}`, // Generate username if null
+      username: username || null, 
       firstName: first_name || "User",
       lastName: last_name || "User",
-      photo: image_url || "https://via.placeholder.com/150", // Fallback image
+      photo: image_url || "https://via.placeholder.com/150", 
     };
 
     console.log("📝 User object to create:", user);
@@ -84,7 +76,6 @@ export async function POST(req: Request) {
       const newUser = await createUser(user);
       console.log("✅ User created successfully:", newUser);
 
-      // Set public metadata
       if (newUser) {
         await (await clerkClient()).users.updateUserMetadata(id, {
           publicMetadata: {
@@ -113,7 +104,7 @@ export async function POST(req: Request) {
     const user = {
       firstName: first_name || "User",
       lastName: last_name || "User",
-      username: username || null, // Allow null username
+      username: username || null, 
       photo: image_url || "https://via.placeholder.com/150",
     };
 

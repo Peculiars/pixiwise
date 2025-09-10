@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { updateUser } from "@/lib/actions/user.actions";
+import { connectToDatabase } from "@/lib/database/mongoose";
+import User from "@/lib/models/user.model";
 
 export async function POST(req: Request) {
   try {
@@ -11,16 +13,42 @@ export async function POST(req: Request) {
     }
 
     const { clerkId, username } = await req.json();
+    
     if (userId !== clerkId) {
       return NextResponse.json({ message: "Forbidden" }, { status: 403 });
     }
 
+    if (!username || username.length < 3) {
+      return NextResponse.json({ 
+        message: "Username must be at least 3 characters" 
+      }, { status: 400 });
+    }
+    await connectToDatabase();
+
+    const existingUser = await User.findOne({ 
+      username: username.toLowerCase(),
+      clerkId: { $ne: clerkId } 
+    });
+
+    if (existingUser) {
+      return NextResponse.json({ 
+        message: "Username already exists" 
+      }, { status: 400 });
+    }
+
+    const currentUser = await User.findOne({ clerkId });
+    
+    if (!currentUser) {
+      return NextResponse.json({ 
+        message: "User not found" 
+      }, { status: 404 });
+    }
     const updatedUser = await updateUser(clerkId, { 
-      username, 
-        firstName: "",
-        lastName: "",
-        photo: "",
-        profileCompleted: true
+      username: username.toLowerCase(),
+      firstName: currentUser.firstName,
+      lastName: currentUser.lastName,
+      photo: currentUser.photo,
+      profileCompleted: true
     });
 
     return NextResponse.json({ 
@@ -38,7 +66,8 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ 
-      message: "Internal server error" 
+      message: "Internal server error",
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     }, { status: 500 });
   }
 }

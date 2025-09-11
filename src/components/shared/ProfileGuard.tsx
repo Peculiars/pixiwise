@@ -25,15 +25,7 @@ const ProfileSetupGuard = ({ children }: { children: React.ReactNode }) => {
         }
 
         const data = await response.json();
-        console.log("Profile status data:", data);
         const needsSetup = !data.profileCompleted || !data.username || !data.hasUsername;
-        
-        console.log("Profile setup needed:", needsSetup, {
-          profileCompleted: data.profileCompleted,
-          hasUsername: data.hasUsername,
-          username: data.username,
-          clerkUsername: user.username
-        });
         
         setNeedsProfileSetup(needsSetup);
         
